@@ -14,6 +14,6 @@ terraform {
   required_version = ">= 1.0.0"
   backend "s3" {
     bucket = "tfstate-storage-nirvana"
-    key    = "xxxxxxxxxxxxxxxx.tfstate"
+    key    = "s3-hosting-sample.tfstate"
   }
 }
