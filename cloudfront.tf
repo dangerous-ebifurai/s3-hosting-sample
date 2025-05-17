@@ -29,6 +29,7 @@ resource "aws_cloudfront_distribution" "test" {
       restriction_type = "none"
     }
   }
+
   tags = {
     Name = var.pj_name
   }
@@ -39,4 +40,38 @@ resource "aws_cloudfront_origin_access_control" "test" {
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
+}
+
+#############################################
+# This resource is used to create a CloudWatch log delivery source for CloudFront
+#############################################
+resource "aws_s3_bucket" "cloudfront_logs" {
+  bucket = "${var.pj_name}-obsidian-logs-cloudfront"
+  tags   = {
+    Name = var.pj_name
+  }
+  
+}
+resource "aws_cloudwatch_log_delivery_source" "test" {
+  name         = "cloudfront-source"
+  log_type     = "ACCESS_LOGS"
+  resource_arn = aws_cloudfront_distribution.test.arn
+}
+
+resource "aws_cloudwatch_log_delivery_destination" "test" {
+  name          = "s3-destination"
+  output_format = "parquet"
+
+  delivery_destination_configuration {
+    destination_resource_arn = aws_s3_bucket.cloudfront_logs.arn
+  }
+}
+
+resource "aws_cloudwatch_log_delivery" "test" {
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.test.name
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.test.arn
+
+  s3_delivery_configuration {
+    suffix_path = "/{DistributionId}/{yyyy}/{MM}/{dd}/{HH}"
+  }
 }

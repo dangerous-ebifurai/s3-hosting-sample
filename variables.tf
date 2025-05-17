@@ -4,8 +4,8 @@ variable "pj_name" {
   default     = "s3-hosting-sample"
 }
 
-variable "sour_ip_address" {
-  description = "The source IP address for the S3 bucket policy"
-  type        = string
-  sensitive = true  
+variable "source_ip_address_list" {
+  description = "The source IP address list for the S3 bucket policy"
+  type        = list(string)
+  sensitive   = true
 }
