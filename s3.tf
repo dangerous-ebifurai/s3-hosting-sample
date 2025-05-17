@@ -40,6 +40,13 @@ data "aws_iam_policy_document" "s3" {
         aws_cloudfront_distribution.test.arn,
       ]
     }
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+      values = [
+        var.sour_ip_address,
+      ]
+    }
   }
 }
 

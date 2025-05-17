@@ -29,6 +29,9 @@ resource "aws_cloudfront_distribution" "test" {
       restriction_type = "none"
     }
   }
+  tags = {
+    Name = var.pj_name
+  }
 }
 
 resource "aws_cloudfront_origin_access_control" "test" {
