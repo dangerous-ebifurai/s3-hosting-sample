@@ -3,6 +3,7 @@ resource "aws_s3_bucket" "test" {
   tags = {
     Name = var.pj_name
   }
+  force_destroy = true
 }
 
 resource "aws_s3_object" "test" {
@@ -13,24 +14,24 @@ resource "aws_s3_object" "test" {
 }
 
 data "aws_iam_policy_document" "s3" {
-#   statement {
-#     effect = "Deny"
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
-#     actions = [
-#       "s3:GetObject"
-#     ]
-#     resources = [
-#       "${aws_s3_bucket.test.arn}/*"
-#     ]
-#     condition {
-#       test     = "NotIpAddress"
-#       variable = "aws:SourceIp"
-#       values = var.source_ip_address_list
-#     }
-#   }
+  #   statement {
+  #     effect = "Deny"
+  #     principals {
+  #       type        = "AWS"
+  #       identifiers = ["*"]
+  #     }
+  #     actions = [
+  #       "s3:GetObject"
+  #     ]
+  #     resources = [
+  #       "${aws_s3_bucket.test.arn}/*"
+  #     ]
+  #     condition {
+  #       test     = "NotIpAddress"
+  #       variable = "aws:SourceIp"
+  #       values = var.source_ip_address_list
+  #     }
+  #   }
   statement {
     principals {
       type        = "Service"
@@ -66,6 +67,8 @@ resource "aws_s3_bucket" "logs" {
   tags = {
     Name = var.pj_name
   }
+  force_destroy = true
+
 }
 
 resource "aws_s3_bucket_logging" "test" {
@@ -76,29 +79,29 @@ resource "aws_s3_bucket_logging" "test" {
 }
 
 data "aws_iam_policy_document" "s3_logging" {
-    statement {
-        effect = "Allow"
-        principals {
-        type        = "Service"
-        identifiers = ["logging.s3.amazonaws.com"]
-        }
-        actions = [
-        "s3:PutObject",
-        ]
-        resources = [
-        "${aws_s3_bucket.logs.arn}/logs/*"
-        ]
-        condition {
-        test     = "ArnLike"
-        variable = "aws:SourceArn"
-        values = [aws_s3_bucket.test.arn]
-        }
-        condition {
-        test     = "StringEquals"
-        variable = "aws:SourceAccount"
-        values = [data.aws_caller_identity.current.id]
-        }
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
     }
+    actions = [
+      "s3:PutObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.logs.arn}/logs/*"
+    ]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [aws_s3_bucket.test.arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.id]
+    }
+  }
 }
 resource "aws_s3_bucket_policy" "logs" {
   bucket = aws_s3_bucket.logs.id
@@ -114,5 +117,5 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     expiration {
       days = 7
     }
-  } 
+  }
 }

@@ -47,10 +47,11 @@ resource "aws_cloudfront_origin_access_control" "test" {
 #############################################
 resource "aws_s3_bucket" "cloudfront_logs" {
   bucket = "${var.pj_name}-obsidian-logs-cloudfront"
-  tags   = {
+  tags = {
     Name = var.pj_name
   }
-  
+  force_destroy = true
+
 }
 resource "aws_cloudwatch_log_delivery_source" "test" {
   name         = "cloudfront-source"
